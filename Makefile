@@ -3,6 +3,7 @@
 	init \
 	plan \
 	install \
+	package \ 
 	run \
 	deploy \
 	clean
@@ -24,7 +25,8 @@ clean:
 package:
 	rm -rf ./package
 	pip install -r requirements.txt -t ./package/
-	cp -r app ./package/
+	mkdir -p ./package/app/engine
+	cp app/main.py ./package/app/
 
 init:
 	terraform -chdir=tf init

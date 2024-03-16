@@ -16,7 +16,7 @@ stockfish_arch = os.getenv("SF_ARCH", default="macos-m1-apple-silicon")
 engine_dir = "./app/engine"
 
 app = FastAPI()
-# handler = Mangum(app)
+handler = Mangum(app)
 
 # Add CORS middleware
 app.add_middleware(
@@ -66,7 +66,7 @@ def download_stockfish():
 
     # Extract the tar file
     with tarfile.open(file_path, "r") as tar:
-        tar.extractall(filter="tar", path=engine_dir)
+        tar.extractall(path=engine_dir)
     
 
 def run_eval(fen: str, depth: int):

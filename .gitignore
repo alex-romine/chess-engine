@@ -9,3 +9,7 @@ __pychache__/
 
 # virtual environment
 venv/
+
+# lambda files
+package/
+tf/lambda_function*
