@@ -1,0 +1,8 @@
+# the engine download
+engine/*
+
+# local terraform init files
+.terraform*
+
+# python cache files
+__pychache__/
