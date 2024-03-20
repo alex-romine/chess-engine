@@ -10,8 +10,6 @@ locals {
   function_name        = "${local.base_name}-lambda-function"
   lambda_arn           = "arn:aws:lambda:${local.aws_region}:${local.account_id}:function:${local.function_name}"
   apig_integration_arn = "arn:aws:apigateway:${local.aws_region}:lambda:path/2015-03-31/functions/${local.lambda_arn}/invocations"
-  
-  engine_binary = "stockfish-ubuntu-x86-64-20-04"
 }
 
 ############################################
