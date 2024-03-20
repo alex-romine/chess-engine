@@ -90,7 +90,7 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = {
       SF_VERSION = "sf_16.1"
-      SF_ARCH    = "ubuntu-x86-64"
+      SF_ARCH    = "amazon-linux-x86-64"
       IS_LAMBDA  = "True"
     }
   }
