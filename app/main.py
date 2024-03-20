@@ -13,7 +13,9 @@ import uvicorn
 
 stockfish_tag = os.getenv("SF_VERSION", default="sf_16.1")
 stockfish_arch = os.getenv("SF_ARCH", default="macos-m1-apple-silicon")
+
 engine_dir = "./app/engine"
+executable_location = f"{engine_dir}/stockfish/stockfish-{stockfish_arch}"
 
 app = FastAPI()
 handler = Mangum(app)
@@ -54,10 +56,10 @@ class EngineRequest(BaseModel):
 
 def download_stockfish():
     
-    if os.path.exists(f"{engine_dir}/stockfish/"):
-        print("Stockfish dir already exists")
+    if os.path.exists(executable_location):
+        print("Stockfish already exists")
         return
-
+        
     # Download stockfish
     print(f"Downloading stockfish")
     url = f"https://github.com/official-stockfish/Stockfish/releases/download/{stockfish_tag}/stockfish-{stockfish_arch}.tar"
@@ -71,7 +73,9 @@ def download_stockfish():
 
 def run_eval(fen: str, depth: int):
     print(f"Running stockfish eval")
-    stockfish = Stockfish(path=f"{engine_dir}/stockfish/stockfish-{stockfish_arch}", depth=depth, parameters={"Threads": 2, "Hash": 64})
+    stockfish = Stockfish(path=executable_location, 
+                            depth=depth, 
+                            parameters={"Threads": 2, "Hash": 64})
 
     stockfish.set_fen_position(fen)
     eval = stockfish.get_top_moves(3)

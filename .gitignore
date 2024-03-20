@@ -1,11 +1,10 @@
 # the engine download
-*/engine/*
 
 # local terraform init files
 .terraform*
 
 # python cache files
-__pychache__/
+__pycache__/
 
 # virtual environment
 venv/
@@ -13,3 +12,8 @@ venv/
 # lambda files
 package/
 tf/lambda_function*
+
+# Everthing else
+.DS_Store
+*.zip
+stockfish.tar

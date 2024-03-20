@@ -26,7 +26,7 @@ package:
 	rm -rf ./package
 	pip install -r requirements.txt -t ./package/
 	mkdir -p ./package/app/engine
-	cp app/main.py ./package/app/
+	cp -r ./app/* ./package/app/
 
 init:
 	terraform -chdir=tf init
@@ -35,7 +35,7 @@ plan:
 	terraform -chdir=tf plan
 
 apply:
-	terraform -chdir=tf apply -auto-approve
+	terraform -chdir=tf apply
 
 deploy:
 	terraform -chdir=tf apply -auto-approve
