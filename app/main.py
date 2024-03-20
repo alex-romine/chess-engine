@@ -3,7 +3,7 @@ from fastapi.responses import Response
 from mangum import Mangum
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
-from stockfish import Stockfish
+from app.engine import Stockfish
 import json
 import os
 import tarfile
@@ -73,15 +73,13 @@ def download_stockfish():
 
 def run_eval(fen: str, depth: int):
     print(f"Running stockfish eval")
-    stockfish = Stockfish(path=executable_location, 
-                            depth=depth, 
-                            parameters={"Threads": 2, "Hash": 64})
+    stockfish = Stockfish(path=executable_location, depth=depth, threads=2, hash=64)
+                            
+    stockfish.send_command(f"position fen {fen}")
+    top_moves = stockfish.get_top_moves()
 
-    stockfish.set_fen_position(fen)
-    eval = stockfish.get_top_moves(3)
-
-    print(f"Eval: {eval}")
-    return eval
+    print(f"Top moves: {top_moves}")
+    return top_moves
         
 
 # FastAPI endpoints for commands
@@ -98,7 +96,7 @@ def best_moves(request: EngineRequest):
     download_stockfish()
     eval = run_eval(fen, depth)
 
-    return {"eval": eval}
+    return {"eval": f"{eval}"}
 
 
 if __name__ == "__main__":
