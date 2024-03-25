@@ -28,7 +28,7 @@ package:
 	mkdir -p ./package/app/engine/stockfish
 	cp ./app/main.py ./package/app/
 	cp ./app/engine.py ./package/app/
-	cp ./app/engine/stockfish/stockfish-amazon-linux-x86-64 ./package/app/engine/stockfish
+	# cp ./app/engine/stockfish/stockfish-amazon-linux-x86-64 ./package/app/engine/stockfish
 
 init:
 	terraform -chdir=tf init

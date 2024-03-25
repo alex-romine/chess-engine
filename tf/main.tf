@@ -75,7 +75,7 @@ resource "aws_lambda_function" "lambda" {
   function_name = local.function_name
   role          = aws_iam_role.lambda.arn
   handler       = "app.main.handler"
-  timeout       = 600
+  timeout       = 60
   
   s3_bucket = aws_s3_object.lambda_code.bucket
   s3_key = aws_s3_object.lambda_code.key
@@ -84,12 +84,12 @@ resource "aws_lambda_function" "lambda" {
 
   runtime       = "python3.11"
   architectures = ["x86_64"]
+  memory_size = 3008
 
   environment {
     variables = {
       SF_VERSION = "sf_16.1"
-      # SF_ARCH    = "ubuntu-x86-64"
-      SF_ARCH    = "amazon-linux-x86-64"
+      SF_ARCH    = "ubuntu-x86-64"
       IS_LAMBDA  = "True"
     }
   }

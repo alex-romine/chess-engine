@@ -77,7 +77,7 @@ def download_stockfish():
 
 def run_eval(fen: str, depth: int):
     print(f"Running stockfish eval")
-    stockfish = Stockfish(path=executable_location, depth=depth, threads=2, hash=64)
+    stockfish = Stockfish(path=executable_location, depth=depth, threads=2, hash=16)
                             
     stockfish.send_command(f"position fen {fen}")
     top_moves = stockfish.get_top_moves()
