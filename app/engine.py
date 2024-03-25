@@ -16,6 +16,7 @@ class Stockfish:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
+            shell=True,
         )
         
         self.send_command("uci")

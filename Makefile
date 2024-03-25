@@ -17,7 +17,7 @@ install: venv
 	. venv/bin/activate; pip install -r requirements.txt
 
 run:
-	uvicorn app.main:app --reload
+	python3 -m uvicorn app.main:app --reload
 
 clean:
 	rm -rf venv
@@ -39,5 +39,5 @@ plan:
 apply:
 	terraform -chdir=tf apply
 
-deploy:
+apply_auto:
 	terraform -chdir=tf apply -auto-approve

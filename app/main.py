@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import Response
 from mangum import Mangum
+from pathlib import Path
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 from app.engine import Stockfish
@@ -14,7 +15,8 @@ import uvicorn
 stockfish_tag = os.getenv("SF_VERSION", default="sf_16.1")
 stockfish_arch = os.getenv("SF_ARCH", default="macos-m1-apple-silicon")
 
-engine_dir = "./app/engine"
+# engine_dir = "./app/engine"
+engine_dir = "/tmp/engine"
 executable_location = f"{engine_dir}/stockfish/stockfish-{stockfish_arch}"
 
 app = FastAPI()
@@ -59,6 +61,8 @@ def download_stockfish():
     if os.path.exists(executable_location):
         print("Stockfish already exists")
         return
+    
+    Path(engine_dir).mkdir(parents=True, exist_ok=True)
         
     # Download stockfish
     print(f"Downloading stockfish")
