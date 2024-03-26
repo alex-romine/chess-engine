@@ -84,24 +84,24 @@ resource "aws_lambda_function" "lambda" {
 
   runtime       = "python3.11"
   architectures = ["x86_64"]
-  memory_size = 3008
+  memory_size = 2048
 
   environment {
     variables = {
       SF_VERSION = "sf_16.1"
-      SF_ARCH    = "ubuntu-x86-64"
+      SF_ARCH    = "amazon-linux-x86-64"
       IS_LAMBDA  = "True"
     }
   }
 }
 
-resource "aws_lambda_permission" "apigw_lambda_chat" {
+resource "aws_lambda_permission" "apigw_lambda_best_moves" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = local.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "arn:aws:execute-api:${local.aws_region}:${local.account_id}:${data.aws_api_gateway_rest_api.be.id}/*/${aws_api_gateway_method.be_chat.http_method}${aws_api_gateway_resource.be_chat.path}"
+  source_arn = "arn:aws:execute-api:${local.aws_region}:${local.account_id}:${data.aws_api_gateway_rest_api.be.id}/*/${aws_api_gateway_method.be_best_moves.http_method}${aws_api_gateway_resource.be_best_moves.path}"
 }
 
 ###############################################
@@ -112,40 +112,40 @@ data "aws_api_gateway_rest_api" "be" {
 }
 
 ########### /best_moves POST ################
-resource "aws_api_gateway_resource" "be_chat" {
+resource "aws_api_gateway_resource" "be_best_moves" {
   rest_api_id = data.aws_api_gateway_rest_api.be.id
   parent_id   = data.aws_api_gateway_rest_api.be.root_resource_id
   path_part   = "best_moves"
 }
 
-resource "aws_api_gateway_method" "be_chat" {
+resource "aws_api_gateway_method" "be_best_moves" {
   rest_api_id   = data.aws_api_gateway_rest_api.be.id
-  resource_id   = aws_api_gateway_resource.be_chat.id
+  resource_id   = aws_api_gateway_resource.be_best_moves.id
   http_method   = "POST"
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration" "be_chat" {
+resource "aws_api_gateway_integration" "be_best_moves" {
   rest_api_id             = data.aws_api_gateway_rest_api.be.id
-  resource_id             = aws_api_gateway_resource.be_chat.id
-  http_method             = aws_api_gateway_method.be_chat.http_method
+  resource_id             = aws_api_gateway_resource.be_best_moves.id
+  http_method             = aws_api_gateway_method.be_best_moves.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = local.apig_integration_arn
 }
 
 ########### /best_moves OPTIONS ################
-resource "aws_api_gateway_method" "be_chat_options" {
+resource "aws_api_gateway_method" "be_best_moves_options" {
   rest_api_id   = data.aws_api_gateway_rest_api.be.id
-  resource_id   = aws_api_gateway_resource.be_chat.id
+  resource_id   = aws_api_gateway_resource.be_best_moves.id
   http_method   = "OPTIONS"
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_method_response" "be_chat_options_200" {
+resource "aws_api_gateway_method_response" "be_best_moves_options_200" {
   rest_api_id = data.aws_api_gateway_rest_api.be.id
-  resource_id = aws_api_gateway_resource.be_chat.id
-  http_method = aws_api_gateway_method.be_chat_options.http_method
+  resource_id = aws_api_gateway_resource.be_best_moves.id
+  http_method = aws_api_gateway_method.be_best_moves_options.http_method
   status_code = "200"
 
   response_models = {
@@ -159,10 +159,10 @@ resource "aws_api_gateway_method_response" "be_chat_options_200" {
   }
 }
 
-resource "aws_api_gateway_integration" "be_chat_options" {
+resource "aws_api_gateway_integration" "be_best_moves_options" {
   rest_api_id = data.aws_api_gateway_rest_api.be.id
-  resource_id = aws_api_gateway_resource.be_chat.id
-  http_method = aws_api_gateway_method.be_chat_options.http_method
+  resource_id = aws_api_gateway_resource.be_best_moves.id
+  http_method = aws_api_gateway_method.be_best_moves_options.http_method
 
   type                 = "MOCK"
   passthrough_behavior = "WHEN_NO_MATCH"

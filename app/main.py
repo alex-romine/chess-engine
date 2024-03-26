@@ -13,11 +13,13 @@ import uvicorn
 
 
 stockfish_tag = os.getenv("SF_VERSION", default="sf_16.1")
+print(f"stockfish_tag: {stockfish_tag}")
 stockfish_arch = os.getenv("SF_ARCH", default="macos-m1-apple-silicon")
+print(f"stockfish_arch: {stockfish_arch}")
 
-# engine_dir = "./app/engine"
-engine_dir = "/tmp/engine"
+engine_dir = "./app/engine"
 executable_location = f"{engine_dir}/stockfish/stockfish-{stockfish_arch}"
+print(f"executable_location: {executable_location}")
 
 app = FastAPI()
 handler = Mangum(app)
@@ -77,7 +79,7 @@ def download_stockfish():
 
 def run_eval(fen: str, depth: int):
     print(f"Running stockfish eval")
-    stockfish = Stockfish(path=executable_location, depth=depth, threads=2, hash=16)
+    stockfish = Stockfish(path=executable_location, depth=depth, threads=1, hash=16)
                             
     stockfish.send_command(f"position fen {fen}")
     top_moves = stockfish.get_top_moves()
