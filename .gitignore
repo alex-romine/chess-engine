@@ -1,5 +1,4 @@
 # the engine download
-stockfish/
 
 # local terraform init files
 .terraform*
