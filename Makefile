@@ -1,34 +1,29 @@
 .PHONY: \
-	apply \
+	package \ 
+	push_image \
+	run \
 	init \
 	plan \
-	install \
-	package \ 
-	run \
-	deploy \
-	clean
+	apply \
+	apply_auto \
+	deploy
 
-
-venv: venv
-	python3 -m venv venv
-	@echo ". venv/bin/activate"
-	
-install: venv
-	. venv/bin/activate; pip install -r requirements.txt
-
-run:
-	python3 -m uvicorn app.main:app --reload
-
-clean:
-	rm -rf venv
+ACCOUNT_NUMBER := $(shell echo $$ACCOUNT_NUMBER)
+REGION = us-east-2
 
 package:
-	rm -rf ./package
-	pip install -r requirements.txt -t ./package/
-	mkdir -p ./package/app/engine/stockfish
-	cp ./app/main.py ./package/app/
-	cp ./app/engine.py ./package/app/
-	cp ./app/engine/stockfish/stockfish-amazon-linux-x86-64 ./package/app/engine/stockfish
+	docker build -t chess-engine .
+
+push_image:
+	aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin $(ACCOUNT_NUMBER).dkr.ecr.${REGION}.amazonaws.com
+	docker tag chess-engine:latest $(ACCOUNT_NUMBER).dkr.ecr.${REGION}.amazonaws.com/chess-engine:latest
+	docker push $(ACCOUNT_NUMBER).dkr.ecr.${REGION}.amazonaws.com/chess-engine:latest
+
+run:
+	docker run --platform linux/arm64 -v ~/.aws-lambda-rie:/aws-lambda -p 9000:8080 \
+		--entrypoint /aws-lambda/aws-lambda-rie \
+		chess-engine \
+		/usr/local/bin/python -m awslambdaric app.main.handler
 
 init:
 	terraform -chdir=tf init
@@ -41,3 +36,8 @@ apply:
 
 apply_auto:
 	terraform -chdir=tf apply -auto-approve
+	
+deploy:
+	make package
+	make push_image
+	make apply_auto

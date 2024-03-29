@@ -15,33 +15,13 @@ locals {
 ############################################
 # Set up Infra
 ############################################
-resource "terraform_data" "package_app" {
-  provisioner "local-exec" {
-    # For some reason the make directive doesn't do the rm -rf ./package on deploy, so it's here too
-    command = "cd ..; rm -rf ./package; rm -rf tf/lambda_function*; make package"
+resource "aws_ecr_repository" "chess_engine" {
+  name                 = local.base_name
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
   }
-
-  triggers_replace = {
-    main_py = filemd5("../app/main.py")
-  }
-}
-
-data "archive_file" "lambda" {
-  depends_on = [terraform_data.package_app]
-
-  type        = "zip"
-  source_dir  = "${path.module}/../package"
-  output_path = "${path.module}/lambda_function_payload-${local.deploy_time}.zip"
-}
-
-data "aws_s3_bucket" "lambda_code" {
-  bucket = "lambda-code-ajromine"
-}
-
-resource "aws_s3_object" "lambda_code" {
-  bucket = data.aws_s3_bucket.lambda_code.bucket
-  key    = "${local.function_name}_payload-${local.deploy_time}.zip"
-  source = data.archive_file.lambda.output_path
 }
 
 ############################################
@@ -74,22 +54,19 @@ resource "aws_iam_role" "lambda" {
 resource "aws_lambda_function" "lambda" {
   function_name = local.function_name
   role          = aws_iam_role.lambda.arn
-  handler       = "app.main.handler"
   timeout       = 60
-  
-  s3_bucket = aws_s3_object.lambda_code.bucket
-  s3_key = aws_s3_object.lambda_code.key
 
-  source_code_hash = data.archive_file.lambda.output_base64sha256
+  architectures = ["arm64"]
+  memory_size   = 1024
 
-  runtime       = "python3.11"
-  architectures = ["x86_64"]
-  memory_size = 2048
+  package_type = "Image"
+  image_uri = "${aws_ecr_repository.chess_engine.repository_url}:latest"
+  source_code_hash = filebase64sha256("../app/main.py")
 
   environment {
     variables = {
       SF_VERSION = "sf_16.1"
-      SF_ARCH    = "amazon-linux-x86-64"
+      SF_ARCH    = "armv8"
       IS_LAMBDA  = "True"
     }
   }

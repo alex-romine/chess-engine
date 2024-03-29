@@ -1,5 +1,6 @@
 from pathlib import Path
-from app.stockfish import Stockfish
+# from app.stockfish import Stockfish
+from stockfish import Stockfish
 import json
 import os
 import tarfile
@@ -38,10 +39,10 @@ def download_stockfish():
 
 def run_eval(fen: str, depth: int):
     print(f"Running stockfish eval")
-    stockfish = Stockfish(path=executable_location, depth=depth, threads=1, hash=16)
+    stockfish = Stockfish(path=executable_location, depth=depth)
                             
-    stockfish.send_command(f"position fen {fen}")
-    top_moves = stockfish.get_top_moves()
+    stockfish.set_fen_position(fen)
+    top_moves = stockfish.get_top_moves(3)
 
     print(f"Top moves: {top_moves}")
     return top_moves
@@ -49,14 +50,8 @@ def run_eval(fen: str, depth: int):
 
 def handler(event, context):
     print(f"Event: {event}")
-    # request = json.loads(event['body'])
-    # fen = request.fen
     fen = event['fen']
-    depth = 16
-    # if request.depth:
-    #     depth = request.depth
-    # else :
-    #     depth = 16
+    depth = event.get('depth', 12)
 
     download_stockfish()
     eval = run_eval(fen, depth)
