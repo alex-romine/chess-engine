@@ -5,6 +5,7 @@ locals {
   base_url    = "chesstransformer.com"
   api_url     = "api.${local.base_url}"
   deploy_time = timestamp()
+  stage_name  = "prd"
 
   base_name            = "chess-engine"
   function_name        = "${local.base_name}-lambda-function"
@@ -148,3 +149,16 @@ resource "aws_api_gateway_integration" "be_best_moves_options" {
   }
 }
 
+########### Lifecycle resources ################
+resource "aws_api_gateway_deployment" "be" {
+  rest_api_id = data.aws_api_gateway_rest_api.be.id
+  stage_name = local.stage_name
+
+  triggers = {
+    main_py = filemd5("../app/main.py")
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}

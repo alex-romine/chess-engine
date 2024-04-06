@@ -50,8 +50,9 @@ def run_eval(fen: str, depth: int):
 
 def handler(event, context):
     print(f"Event: {event}")
-    fen = event['fen']
-    depth = event.get('depth', 12)
+    body = json.loads(event['body'])
+    fen = body['fen']
+    depth = body.get('depth', 12)
 
     download_stockfish()
     eval = run_eval(fen, depth)
